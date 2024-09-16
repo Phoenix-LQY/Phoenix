@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开发者面板</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>本周抽签结果</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>成员</th>
+                    <th>抽中对象</th>
+                    <th>查询状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member, choice in results.items() %}
+                <tr>
+                    <td>{{ member }}</td>
+                    <td>{{ choice }}</td>
+                    <td>{{ '已查询' if member in queried_members else '未查询' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <form action="/admin_panel" method="POST">
+            <button name="reset" type="submit">重置抽签</button>
+            <button name="reveal" type="submit">投送结果</button>
+        </form>
+        <br>
+        <a href="{{ url_for('index') }}" class="button-link">返回首页</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>口译小组抽签筒😎</h1>
+
+        {% if results_revealed %}
+        <a style="font-size: 16px !important">本周抽签已完成✅</a>
+            <table>
+                <thead>
+                    <tr>
+                        <th>成员</th>
+                        <th>抽中对象</th>
+                        <th>查询状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member, choice in results.items() %}
+                    <tr>
+                        <td>{{ member }}</td>
+                        <td>{{ choice }}</td>
+                        <td>{{ '已查询' if member in queried_members else '未查询' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <a style="font-size: 16px !important">本周抽签未完成⌛️</a>
+            <form action="/" method="POST">
+                <input type="text" name="name" placeholder="请输入你的姓名">
+                <button type="submit">前往抽签</button>
+            </form>
+             {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-message">
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                </div> 
+            {% endif %}
+            {% endwith %}
+        {% endif %}
+        <br>
+        <a href="{{ url_for('admin') }}">开发者登录</a>
+    </div>
+</body>
+</html>
