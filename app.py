@@ -12,6 +12,10 @@ draw_results = {}
 queried_members = set()
 results_revealed = False
 
+# 成员抽签次数限制
+max_draw_attempts = 1
+draw_attempts = {member: 0 for member in members}  # 初始化每个成员的抽签次数为0
+
 # 开发者密钥
 developer_key = '.livefree'
 
@@ -24,8 +28,14 @@ def index():
             flash("同学，你名字都打错啦😒", 'error')
             return redirect(url_for('index'))
 
-        # 记录该成员已查询
+        # 检查该成员是否已经超过抽签次数限制
+        if draw_attempts[name] >= max_draw_attempts:
+            flash("你本周已抽签", 'error')
+            return redirect(url_for('index'))
+
+        # 记录该成员已查询，并增加抽签次数
         queried_members.add(name)
+        draw_attempts[name] += 1  # 增加抽签次数
 
         if not draw_results:  # 如果尚未抽签，进行抽签
             remaining_members = members[:]
@@ -67,16 +77,19 @@ def admin_panel():
     global results_revealed
     if request.method == 'POST':
         if 'reset' in request.form:
-            draw_results.clear()
-            queried_members.clear()
-            results_revealed = False
-            flash("抽签结果已重置", 'success')
+            draw_results.clear()  # 清除抽签结果
+            queried_members.clear()  # 清除查询状态
+            results_revealed = False  # 重置结果是否投送的状态
+            # 重置所有成员的抽签次数
+            for member in members:
+                draw_attempts[member] = 0  # 初始化抽签次数
+            flash("抽签结果和抽签次数已重置", 'success')  # 显示成功消息
         elif 'reveal' in request.form:
             results_revealed = True
             flash("结果已投送到首页", 'success')
 
         return redirect(url_for('admin_panel'))
- 
+
     return render_template('admin_panel.html', results=draw_results, queried_members=queried_members)
 
 if __name__ == '__main__':
